@@ -67,7 +67,6 @@ window.onload = function () {
   }
 
   function makeElement(firstDate) {
-    
     let dateSet = 1;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 7; j++) {
@@ -83,17 +82,16 @@ window.onload = function () {
         } else {
           // 해당 칸에 날짜가 있으면 div엘리먼트 생성 후 해당 날짜 넣어주기
           let dateEl = document.createElement("div");
-          let dataUl = document.createElement("ul")
           
+
           dateEl.textContent = dateSet;
           dateEl.setAttribute("class", dateSet);
           dateEl.setAttribute("id", `${today.format2()}-${dateSet}`);
           calendarBody.appendChild(dateEl);
-          
+
           dateSet++;
         }
       }
-      
     }
     // 현재 내가 선택한 날짜가 있으면 이전 달, 다음 달로 넘어가도 화면에 보여주기 위해 써줌
     let clickedDate = document.getElementsByClassName(today.getDate());
@@ -211,7 +209,7 @@ window.onload = function () {
           const liEl2 = document.createElement("li");
           const spanEl2 = document.createElement("span");
           const delBtn2 = document.createElement("button");
-          
+
           delBtn2.innerText = "삭제";
           delBtn2.setAttribute("class", "del-data");
           spanEl2.innerHTML = DATA[todoList][i].todo;
@@ -221,9 +219,6 @@ window.onload = function () {
           liEl2.setAttribute("id", DATA[todoList][i].id);
           delBtn2.addEventListener("click", delWork);
           liEl2.addEventListener("dblclick", showTodo);
-
-          
-
         }
       }
     }
@@ -263,6 +258,7 @@ window.onload = function () {
   function delWork(e) {
     e.preventDefault();
     let delParentLi = e.target.parentNode;
+    console.log(delParentLi)
     inputList.removeChild(delParentLi);
     // DATA[currentDate]를 filter함수를 이용해 todo로 돌면서 todo의 아이디값과 현재 내가 누른 아이디값이 같지 않은 것을 배열에 담아 리턴해주어서
     // 내가 지우고자 하는 요소를 뺀 나머지 요소를 배열에 담아 리턴해준다.

@@ -188,7 +188,6 @@ window.onload = function () {
           // 해당 칸에 날짜가 있으면 div엘리먼트 생성 후 해당 날짜 넣어주기
           var _dateEl = document.createElement("div");
 
-          var dataUl = document.createElement("ul");
           _dateEl.textContent = dateSet;
 
           _dateEl.setAttribute("class", dateSet);
@@ -363,6 +362,7 @@ window.onload = function () {
   function delWork(e) {
     e.preventDefault();
     var delParentLi = e.target.parentNode;
+    console.log(delParentLi);
     inputList.removeChild(delParentLi); // DATA[currentDate]를 filter함수를 이용해 todo로 돌면서 todo의 아이디값과 현재 내가 누른 아이디값이 같지 않은 것을 배열에 담아 리턴해주어서
     // 내가 지우고자 하는 요소를 뺀 나머지 요소를 배열에 담아 리턴해준다.
     // 그 배열을 다시 DATA[currentDate]에 할당하여 save();를 통해 localStorage에 넣어준다.
@@ -418,7 +418,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61273" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49756" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
