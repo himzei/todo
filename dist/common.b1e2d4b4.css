@@ -308,7 +308,10 @@ input[type="submit"]:active {
   padding-top: 5px;
   padding-left: 7px;
   background-color: white;
+  display: grid;
+  grid-template-rows: 30px repeat(5, 1fr) ;
 }
+
 
 
 /*# sourceMappingURL=/common.b1e2d4b4.css.map */

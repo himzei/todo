@@ -188,11 +188,23 @@ window.onload = function () {
           // 해당 칸에 날짜가 있으면 div엘리먼트 생성 후 해당 날짜 넣어주기
           var _dateEl = document.createElement("div");
 
-          _dateEl.textContent = dateSet;
+          var _currentDate = "".concat(today.format2(), "-").concat(dateSet);
+
+          var titleData = document.createElement("div");
+          var todoData = document.createElement("div");
+          var storeObj = localStorage.getItem(_currentDate);
+          titleData.setAttribute("class", "titleEl");
+          titleData.innerHTML = dateSet;
+          todoData.setAttribute("class", "todoEl");
+          todoData.innerText = storeObj;
 
           _dateEl.setAttribute("class", dateSet);
 
-          _dateEl.setAttribute("id", "".concat(today.format2(), "-").concat(dateSet));
+          _dateEl.appendChild(titleData);
+
+          _dateEl.appendChild(todoData);
+
+          _dateEl.setAttribute("id", _currentDate);
 
           calendarBody.appendChild(_dateEl);
           dateSet++;
@@ -252,7 +264,8 @@ window.onload = function () {
     }
 
     target.classList.add("active");
-    today = new Date(today.getFullYear(), today.getMonth(), target.innerHTML);
+    var childTarget = target.querySelector(".titleEl");
+    today = new Date(today.getFullYear(), today.getMonth(), childTarget.innerHTML);
     showMain();
     currentDateget();
     redrawLi();
@@ -418,7 +431,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49756" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50782" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

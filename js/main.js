@@ -67,6 +67,7 @@ window.onload = function () {
   }
 
   function makeElement(firstDate) {
+    
     let dateSet = 1;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 7; j++) {
@@ -82,13 +83,24 @@ window.onload = function () {
         } else {
           // 해당 칸에 날짜가 있으면 div엘리먼트 생성 후 해당 날짜 넣어주기
           let dateEl = document.createElement("div");
+          let currentDate = `${today.format2()}-${dateSet}`
+          let titleData = document.createElement("div")
+          let todoData = document.createElement("div")
+          let storeObj = localStorage.getItem(currentDate);
+
+          titleData.setAttribute("class", "titleEl")
+          titleData.innerHTML = dateSet
           
-
-          dateEl.textContent = dateSet;
+          todoData.setAttribute("class", "todoEl")
+          todoData.innerText = storeObj
+          
           dateEl.setAttribute("class", dateSet);
-          dateEl.setAttribute("id", `${today.format2()}-${dateSet}`);
+          dateEl.appendChild(titleData)
+          dateEl.appendChild(todoData)
+          
+          dateEl.setAttribute("id", currentDate);
           calendarBody.appendChild(dateEl);
-
+          
           dateSet++;
         }
       }
@@ -146,13 +158,17 @@ window.onload = function () {
 
   calendarBody.addEventListener("click", function (e) {
     let target = e.target;
+    
     let eachDate = document.querySelectorAll(".calendar-body  > div");
+    
     if (e.target.innerHTML === "") return;
     for (let i = 0; i < eachDate.length; i++) {
       eachDate[i].classList.remove("active");
     }
     target.classList.add("active");
-    today = new Date(today.getFullYear(), today.getMonth(), target.innerHTML);
+    let childTarget = target.querySelector(".titleEl")
+    
+    today = new Date(today.getFullYear(), today.getMonth(), childTarget.innerHTML);
     showMain();
     currentDateget();
     redrawLi();
@@ -227,6 +243,7 @@ window.onload = function () {
   // 다음달,이전달 다른날, 첫 로드 될 때 마다 todo 목록이 있으면(if로 조건문 처리) 다 지우고 다시 그려주는 함수
   function resetInsert() {
     let storeObj = localStorage.getItem(currentDate);
+    
     if (storeObj !== null) {
       let liEl = document.querySelectorAll("LI");
       for (let i = 0; i < liEl.length; i++) {
@@ -234,6 +251,7 @@ window.onload = function () {
       }
       // parse 해주기 전에는 localStorage는 string만 가져오니까 parse해준다.
       const parsed = JSON.parse(localStorage.getItem(currentDate));
+      
       // forEach로 작성되있는 모든 todolist의 항목들을 돌면서 로컬에 저장되어 있는 목록을 화면에 만들어준다.
       parsed.forEach(function (todo) {
         if (todo) {
