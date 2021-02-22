@@ -118,26 +118,26 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"js/main.js":[function(require,module,exports) {
+var DATA = [];
+
+Date.prototype.format = function () {
+  // 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
+  var yyyy = this.getFullYear();
+  var month = this.getMonth() + 1;
+  var dd = this.getDate();
+  var format = [yyyy, month, dd].join("-");
+  return format;
+};
+
+Date.prototype.format2 = function () {
+  // 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
+  var yyyy = this.getFullYear();
+  var month = this.getMonth() + 1;
+  var format = [yyyy, month].join("-");
+  return format;
+};
+
 window.onload = function () {
-  var DATA = {};
-
-  Date.prototype.format = function () {
-    // 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
-    var yyyy = this.getFullYear();
-    var month = this.getMonth() + 1;
-    var dd = this.getDate();
-    var format = [yyyy, month, dd].join("-");
-    return format;
-  };
-
-  Date.prototype.format2 = function () {
-    // 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
-    var yyyy = this.getFullYear();
-    var month = this.getMonth() + 1;
-    var format = [yyyy, month].join("-");
-    return format;
-  };
-
   var today = new Date();
   var calendarBody = document.querySelector(".calendar-body");
   var prevEl = document.querySelector(".prev");
@@ -166,7 +166,7 @@ window.onload = function () {
       pageYear = notLeapYear;
     }
 
-    headerYear.innerHTML = "\uC624\uB298";
+    headerYear.innerHTML = "오늘";
     makeElement(firstDate);
     showMain();
     currentDateget();
@@ -185,36 +185,43 @@ window.onload = function () {
           var dateEl = document.createElement("div");
           calendarBody.appendChild(dateEl);
         } else {
-          // 해당 칸에 날짜가 있으면 div엘리먼트 생성 후 해당 날짜 넣어주기
-          var _dateEl = document.createElement("div");
+          (function () {
+            // 해당 칸에 날짜가 있으면 div엘리먼트 생성 후 해당 날짜 넣어주기
+            var dateEl = document.createElement("div");
+            var currentDate = "".concat(today.format2(), "-").concat(dateSet);
+            var titleData = document.createElement("div");
+            var todoData = document.createElement("div");
+            var storeObj = localStorage.getItem(currentDate);
+            titleData.setAttribute("class", "titleEl");
+            titleData.innerText = dateSet;
+            todoData.setAttribute("class", "todoEl");
+            dateEl.setAttribute("class", dateSet);
+            dateEl.appendChild(titleData);
 
-          var _currentDate = "".concat(today.format2(), "-").concat(dateSet);
+            if (storeObj !== null) {
+              var parsed = JSON.parse(localStorage.getItem(currentDate));
+              parsed.forEach(function (todo) {
+                if (todo) {
+                  var divli = document.createElement("div");
+                  divli.setAttribute("class", "todoEl");
+                  divli.setAttribute("id", todo.id);
+                  divli.innerText = todo.todo;
+                  dateEl.appendChild(divli);
+                }
+              });
+            }
 
-          var titleData = document.createElement("div");
-          var todoData = document.createElement("div");
-          var storeObj = localStorage.getItem(_currentDate);
-          titleData.setAttribute("class", "titleEl");
-          titleData.innerHTML = dateSet;
-          todoData.setAttribute("class", "todoEl");
-          todoData.innerText = storeObj;
-
-          _dateEl.setAttribute("class", dateSet);
-
-          _dateEl.appendChild(titleData);
-
-          _dateEl.appendChild(todoData);
-
-          _dateEl.setAttribute("id", _currentDate);
-
-          calendarBody.appendChild(_dateEl);
-          dateSet++;
+            dateEl.setAttribute("id", currentDate);
+            calendarBody.appendChild(dateEl);
+            dateSet++;
+          })();
         }
       }
     } // 현재 내가 선택한 날짜가 있으면 이전 달, 다음 달로 넘어가도 화면에 보여주기 위해 써줌
 
 
     var clickedDate = document.getElementsByClassName(today.getDate());
-    clickedDate[0].classList.add("active");
+    clickedDate[0].querySelector(".titleEl").classList.add("active");
   }
 
   function removeCalendar() {
@@ -256,7 +263,7 @@ window.onload = function () {
 
   calendarBody.addEventListener("click", function (e) {
     var target = e.target;
-    var eachDate = document.querySelectorAll(".calendar-body  > div");
+    var eachDate = document.querySelectorAll(".calendar-body > div > .active");
     if (e.target.innerHTML === "") return;
 
     for (var i = 0; i < eachDate.length; i++) {
@@ -264,8 +271,7 @@ window.onload = function () {
     }
 
     target.classList.add("active");
-    var childTarget = target.querySelector(".titleEl");
-    today = new Date(today.getFullYear(), today.getMonth(), childTarget.innerHTML);
+    today = new Date(today.getFullYear(), today.getMonth(), parseInt(target.innerText));
     showMain();
     currentDateget();
     redrawLi();
@@ -375,11 +381,11 @@ window.onload = function () {
   function delWork(e) {
     e.preventDefault();
     var delParentLi = e.target.parentNode;
-    console.log(delParentLi);
     inputList.removeChild(delParentLi); // DATA[currentDate]를 filter함수를 이용해 todo로 돌면서 todo의 아이디값과 현재 내가 누른 아이디값이 같지 않은 것을 배열에 담아 리턴해주어서
     // 내가 지우고자 하는 요소를 뺀 나머지 요소를 배열에 담아 리턴해준다.
     // 그 배열을 다시 DATA[currentDate]에 할당하여 save();를 통해 localStorage에 넣어준다.
 
+    console.log(DATA[currentDate]);
     var cleanToDos = DATA[currentDate].filter(function (todo) {
       return todo.id !== parseInt(delParentLi.id);
     });
@@ -431,7 +437,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50782" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61552" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

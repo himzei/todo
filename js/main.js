@@ -1,23 +1,25 @@
+let DATA = [];
+
+Date.prototype.format = function () {
+// 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
+  let yyyy = this.getFullYear();
+  let month = this.getMonth() + 1;
+  let dd = this.getDate();
+  let format = [yyyy, month, dd].join("-");
+  return format;
+};
+
+Date.prototype.format2 = function () {
+// 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
+  let yyyy = this.getFullYear();
+  let month = this.getMonth() + 1;
+  let format = [yyyy, month].join("-");
+  return format;
+};
+
+
 window.onload = function () {
-  let DATA = {};
-
-  Date.prototype.format = function () {
-    // 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
-    let yyyy = this.getFullYear();
-    let month = this.getMonth() + 1;
-    let dd = this.getDate();
-    let format = [yyyy, month, dd].join("-");
-    return format;
-  };
-
-  Date.prototype.format2 = function () {
-    // 현재 날짜 보기좋게 출력 / 사용방법: newDate().format() 으로 사용가능
-    let yyyy = this.getFullYear();
-    let month = this.getMonth() + 1;
-    let format = [yyyy, month].join("-");
-    return format;
-  };
-
+  
   let today = new Date();
   const calendarBody = document.querySelector(".calendar-body");
   const prevEl = document.querySelector(".prev");
@@ -59,7 +61,8 @@ window.onload = function () {
     } else {
       pageYear = notLeapYear;
     }
-    headerYear.innerHTML = `오늘`;
+    headerYear.innerHTML = "오늘";
+
     makeElement(firstDate);
     showMain();
     currentDateget();
@@ -67,7 +70,6 @@ window.onload = function () {
   }
 
   function makeElement(firstDate) {
-    
     let dateSet = 1;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 7; j++) {
@@ -83,31 +85,43 @@ window.onload = function () {
         } else {
           // 해당 칸에 날짜가 있으면 div엘리먼트 생성 후 해당 날짜 넣어주기
           let dateEl = document.createElement("div");
-          let currentDate = `${today.format2()}-${dateSet}`
-          let titleData = document.createElement("div")
-          let todoData = document.createElement("div")
+          let currentDate = `${today.format2()}-${dateSet}`;
+          let titleData = document.createElement("div");
+          let todoData = document.createElement("div");
           let storeObj = localStorage.getItem(currentDate);
 
-          titleData.setAttribute("class", "titleEl")
-          titleData.innerHTML = dateSet
-          
-          todoData.setAttribute("class", "todoEl")
-          todoData.innerText = storeObj
-          
+          titleData.setAttribute("class", "titleEl");
+          titleData.innerText = dateSet;
+
+          todoData.setAttribute("class", "todoEl");
+
           dateEl.setAttribute("class", dateSet);
-          dateEl.appendChild(titleData)
-          dateEl.appendChild(todoData)
-          
+          dateEl.appendChild(titleData);
+
+          if (storeObj !== null) {
+            const parsed = JSON.parse(localStorage.getItem(currentDate));
+            parsed.forEach(function (todo) {
+              if (todo) {
+                let divli = document.createElement("div");
+                divli.setAttribute("class", "todoEl");
+                divli.setAttribute("id", todo.id);
+                divli.innerText = todo.todo;
+                dateEl.appendChild(divli);
+              }
+            });
+          }
+
           dateEl.setAttribute("id", currentDate);
           calendarBody.appendChild(dateEl);
-          
+
           dateSet++;
         }
       }
     }
     // 현재 내가 선택한 날짜가 있으면 이전 달, 다음 달로 넘어가도 화면에 보여주기 위해 써줌
     let clickedDate = document.getElementsByClassName(today.getDate());
-    clickedDate[0].classList.add("active");
+
+    clickedDate[0].querySelector(".titleEl").classList.add("active");
   }
 
   function removeCalendar() {
@@ -158,17 +172,18 @@ window.onload = function () {
 
   calendarBody.addEventListener("click", function (e) {
     let target = e.target;
-    
-    let eachDate = document.querySelectorAll(".calendar-body  > div");
-    
+    let eachDate = document.querySelectorAll(".calendar-body > div > .active");
+
     if (e.target.innerHTML === "") return;
     for (let i = 0; i < eachDate.length; i++) {
       eachDate[i].classList.remove("active");
     }
     target.classList.add("active");
-    let childTarget = target.querySelector(".titleEl")
-    
-    today = new Date(today.getFullYear(), today.getMonth(), childTarget.innerHTML);
+    today = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      parseInt(target.innerText)
+    );
     showMain();
     currentDateget();
     redrawLi();
@@ -243,7 +258,7 @@ window.onload = function () {
   // 다음달,이전달 다른날, 첫 로드 될 때 마다 todo 목록이 있으면(if로 조건문 처리) 다 지우고 다시 그려주는 함수
   function resetInsert() {
     let storeObj = localStorage.getItem(currentDate);
-    
+
     if (storeObj !== null) {
       let liEl = document.querySelectorAll("LI");
       for (let i = 0; i < liEl.length; i++) {
@@ -251,7 +266,7 @@ window.onload = function () {
       }
       // parse 해주기 전에는 localStorage는 string만 가져오니까 parse해준다.
       const parsed = JSON.parse(localStorage.getItem(currentDate));
-      
+
       // forEach로 작성되있는 모든 todolist의 항목들을 돌면서 로컬에 저장되어 있는 목록을 화면에 만들어준다.
       parsed.forEach(function (todo) {
         if (todo) {
@@ -274,13 +289,14 @@ window.onload = function () {
   resetInsert();
 
   function delWork(e) {
+    
     e.preventDefault();
     let delParentLi = e.target.parentNode;
-    console.log(delParentLi)
     inputList.removeChild(delParentLi);
     // DATA[currentDate]를 filter함수를 이용해 todo로 돌면서 todo의 아이디값과 현재 내가 누른 아이디값이 같지 않은 것을 배열에 담아 리턴해주어서
     // 내가 지우고자 하는 요소를 뺀 나머지 요소를 배열에 담아 리턴해준다.
     // 그 배열을 다시 DATA[currentDate]에 할당하여 save();를 통해 localStorage에 넣어준다.
+    console.log(DATA[currentDate])
     const cleanToDos = DATA[currentDate].filter(function (todo) {
       return todo.id !== parseInt(delParentLi.id);
     });
